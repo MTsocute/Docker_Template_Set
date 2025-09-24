@@ -1,0 +1,40 @@
+services:
+  emqx:
+    image: emqx/emqx:5.0.12
+    container_name: emqx
+    restart: unless-stopped
+    ports:
+      - "1883:1883"     # MQTT TCP 端口
+      - "8083:8083"     # MQTT WebSocket 端口
+      - "8084:8084"     # MQTT WebSocket SSL 端口
+      - "8883:8883"     # MQTT SSL 端口
+      - "18083:18083"   # Dashboard 管理界面
+    environment:
+      - EMQX_NAME=emqx
+      - EMQX_HOST=127.0.0.1
+      # EMQX 5.x 版本的正确配置方式
+      - EMQX_DASHBOARD__DEFAULT_USERNAME=admin
+      - EMQX_DASHBOARD__DEFAULT_PASSWORD=public
+      # 添加节点 cookie 配置
+      - EMQX_NODE__COOKIE=emqxsecretcookie
+    volumes:
+      - emqx_data:/opt/emqx/data
+      - emqx_log:/opt/emqx/log
+    healthcheck:
+      test: ["CMD", "/opt/emqx/bin/emqx_ctl", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    networks:
+      - emqx-network
+
+volumes:
+  emqx_data:
+    driver: local
+  emqx_log:
+    driver: local
+
+networks:
+  emqx-network:
+    driver: bridge

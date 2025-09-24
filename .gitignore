@@ -1,0 +1,47 @@
+# Docker相关
+.env
+.env.local
+.env.*.local
+
+# 日志文件
+*.log
+logs/
+**/logs/
+
+# 数据目录 - 避免提交容器产生的数据
+**/data/
+**/mysql-data/
+**/emqx-data/
+**/es-data/
+**/elasticsearch-data/
+
+# 临时文件
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# IDE和编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 备份文件
+*.bak
+*.backup
+
+# 运行时文件
+*.pid
+*.sock
+
+# SSL证书和密钥文件
+*.pem
+*.key
+*.crt
+*.cert
+
+# 本地配置文件（可能包含敏感信息）
+**/local-config/
+config.local.*

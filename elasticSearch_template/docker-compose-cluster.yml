@@ -1,0 +1,105 @@
+version: '3.8'
+
+services:
+  es01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION:-8.11.0}
+    container_name: es01
+    environment:
+      - node.name=es01
+      - cluster.name=${CLUSTER_NAME:-es-docker-cluster}
+      - discovery.seed_hosts=es02,es03
+      - cluster.initial_master_nodes=es01,es02,es03
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=${XPACK_SECURITY_ENABLED:-false}
+      - xpack.security.enrollment.enabled=false
+      - xpack.security.http.ssl.enabled=false
+      - xpack.security.transport.ssl.enabled=false
+      - "ES_JAVA_OPTS=${ES_JAVA_OPTS:--Xms512m -Xmx512m}"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - es01_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    networks:
+      - elastic
+    restart: unless-stopped
+
+  es02:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION:-8.11.0}
+    container_name: es02
+    environment:
+      - node.name=es02
+      - cluster.name=${CLUSTER_NAME:-es-docker-cluster}
+      - discovery.seed_hosts=es01,es03
+      - cluster.initial_master_nodes=es01,es02,es03
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=${XPACK_SECURITY_ENABLED:-false}
+      - xpack.security.enrollment.enabled=false
+      - xpack.security.http.ssl.enabled=false
+      - xpack.security.transport.ssl.enabled=false
+      - "ES_JAVA_OPTS=${ES_JAVA_OPTS:--Xms512m -Xmx512m}"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - es02_data:/usr/share/elasticsearch/data
+    networks:
+      - elastic
+    restart: unless-stopped
+
+  es03:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION:-8.11.0}
+    container_name: es03
+    environment:
+      - node.name=es03
+      - cluster.name=${CLUSTER_NAME:-es-docker-cluster}
+      - discovery.seed_hosts=es01,es02
+      - cluster.initial_master_nodes=es01,es02,es03
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=${XPACK_SECURITY_ENABLED:-false}
+      - xpack.security.enrollment.enabled=false
+      - xpack.security.http.ssl.enabled=false
+      - xpack.security.transport.ssl.enabled=false
+      - "ES_JAVA_OPTS=${ES_JAVA_OPTS:--Xms512m -Xmx512m}"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - es03_data:/usr/share/elasticsearch/data
+    networks:
+      - elastic
+    restart: unless-stopped
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:${ELASTIC_VERSION:-8.11.0}
+    container_name: kibana-cluster
+    environment:
+      - ELASTICSEARCH_HOSTS=http://es01:9200
+      - xpack.security.enabled=${XPACK_SECURITY_ENABLED:-false}
+      - xpack.encryptedSavedObjects.encryptionKey=${KIBANA_ENCRYPTION_KEY:-a7a6311933d3503b89bc2dbc36572c33a6c10925682e591bffcab6911c06786d}
+    ports:
+      - "${KIBANA_PORT:-5601}:5601"
+    depends_on:
+      - es01
+      - es02
+      - es03
+    networks:
+      - elastic
+    restart: unless-stopped
+
+volumes:
+  es01_data:
+    driver: local
+  es02_data:
+    driver: local
+  es03_data:
+    driver: local
+
+networks:
+  elastic:
+    driver: bridge

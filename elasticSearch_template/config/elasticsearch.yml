@@ -1,0 +1,33 @@
+# Elasticsearch 配置文件
+
+# 集群名称
+cluster.name: "docker-cluster"
+
+# 网络设置
+network.host: 0.0.0.0
+http.port: 9200
+
+# 发现设置
+discovery.type: single-node
+
+# 路径设置
+path.data: /usr/share/elasticsearch/data
+path.logs: /usr/share/elasticsearch/logs
+
+# 内存设置
+bootstrap.memory_lock: false
+
+# 跨域设置 (允许所有来源访问)
+http.cors.enabled: true
+http.cors.allow-origin: "*"
+http.cors.allow-methods: GET, POST, PUT, DELETE, OPTIONS, HEAD
+http.cors.allow-headers: "X-Requested-With,Content-Type,Content-Length,Authorization"
+
+# 安全设置 (关闭安全验证)
+xpack.security.enabled: false
+xpack.security.enrollment.enabled: false
+xpack.security.http.ssl.enabled: false
+xpack.security.transport.ssl.enabled: false
+
+# 监控设置
+xpack.monitoring.collection.enabled: false
